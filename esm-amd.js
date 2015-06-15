@@ -51,6 +51,10 @@ function translateImport(node, simulateCycle) {
 
     if (specifier.type === 'ImportDefaultSpecifier') {
       imported = 'default';
+    } else if (specifier.type === 'ImportNamespaceSpecifier') {
+      // Explicitly no imported name, the whole module object is
+      // bound to the local identifier.
+      imported = '';
     } else if (specifier.imported) {
       imported = specifier.imported.name;
     }
@@ -76,9 +80,54 @@ function translateImport(node, simulateCycle) {
   return translation;
 }
 
+function translateDefaultExport(node) {
+  var translation = {
+    range: [node.range[0], node.declaration.range[0]],
+    result: 'exports.default = '
+  };
+
+  return translation;
+}
+
+function translateNamedExport(node) {
+  var translation = {
+    range: [node.range[0], 0],
+    result: ''
+  };
+
+  if (node.declaration) {
+    // export function name() {}
+    translation.range[1] = node.declaration.range[0];
+
+    // Find the identifier name to use for the export
+    var id;
+    traverse(node, function(node) {
+      if (!id && node.type === 'Identifier') {
+        id = node.name;
+        return false;
+      }
+    });
+
+    translation.result = 'exports.' + id + ' = ';
+  } else {
+    // export { name as other }
+    translation.range[1] = node.range[1];
+    var result = '';
+    node.specifiers.forEach(function(specifier) {
+      var local = specifier.local.name,
+          exported = specifier.exported.name;
+
+      result += 'exports.' + exported + ' = ' + local + ';';
+    });
+    translation.result = result;
+  }
+
+  return translation;
+}
 
 module.exports = function(source, options) {
   options = options || {};
+  var simulateCycle = !!options.simulateCycle;
 
   var translations = [];
 
@@ -96,15 +145,22 @@ module.exports = function(source, options) {
     var translation;
 
     if (node.type === 'ImportDeclaration') {
-      translation = translateImport(node);
+      translation = translateImport(node, simulateCycle);
 
-      if (options.simulateCycle) {
+      if (simulateCycle) {
         Object.keys(translation.ids).forEach(function(key) {
           ids[key] = translation.ids[key];
         });
       }
 
       translations.push(translation);
+    } else if (node.type === 'ExportDefaultDeclaration') {
+      translations.push(translateDefaultExport(node));
+    } else if (node.type === 'ExportNamedDeclaration') {
+      translations.push(translateNamedExport(node));
+    } else if (simulateCycle && options.node.type === 'Identifier') {
+      // Translate the identifiers to getters for imports.
+//todo
     }
 
   });
@@ -130,6 +186,7 @@ module.exports = function(source, options) {
 
   return {
     translated: true,
+    //source: 'define(function(require, exports, module) { ' + source + ' });'
     source: source
   };
 };

@@ -16,6 +16,7 @@ files.forEach(function(fileName) {
       expected = fs.readFileSync(path.join(expectedDir, fileName), 'utf8');
 
   it(fileName, function() {
+    console.log(esmAmd(source).source);
     assert.equal(expected, esmAmd(source).source);
   });
 
