@@ -1,0 +1,23 @@
+{
+  "name": "esm-amd",
+  "version": "0.0.1",
+  "description": "",
+  "main": "esm-amd.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jrburke/esm-amd.git"
+  },
+  "author": "James Burke",
+  "license": "BSD-3-Clause AND MIT",
+  "bugs": {
+    "url": "https://github.com/jrburke/esm-amd/issues"
+  },
+  "homepage": "https://github.com/jrburke/esm-amd",
+  "devDependencies": {
+    "esprima": "^2.2.0",
+    "mocha": "^2.2.5"
+  }
+}
