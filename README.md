@@ -4,6 +4,7 @@
 
 * replace identifiers for simulateCycle option.
 * option around define() wrapping.
+* hack in support for a module meta? `import { require, normalize } from module`?
 
 ---
 

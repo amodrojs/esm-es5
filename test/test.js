@@ -5,7 +5,7 @@
 var assert = require('assert'),
     fs = require('fs'),
     path = require('path'),
-    esmAmd = require('../esm-amd'),
+    esmEs5 = require('../esm-es5'),
     sourceDir = path.join(__dirname, 'source'),
     expectedDir = path.join(__dirname, 'expected');
 
@@ -16,8 +16,8 @@ files.forEach(function(fileName) {
       expected = fs.readFileSync(path.join(expectedDir, fileName), 'utf8');
 
   it(fileName, function() {
-    console.log(esmAmd(source).source);
-    assert.equal(expected, esmAmd(source).source);
+    console.log(esmEs5(source).source);
+    assert.equal(expected, esmEs5(source).source);
   });
 
 });
