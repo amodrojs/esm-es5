@@ -21,3 +21,13 @@ files.forEach(function(fileName) {
   });
 
 });
+
+// Test depIds field
+it('depIds found', function() {
+  var source = fs.readFileSync(path.join(sourceDir, 'one.js'), 'utf8'),
+      result = esmEs5(source);
+
+  assert.equal(1, result.depIds.length);
+  assert.equal('module-name', result.depIds[0]);
+});
+

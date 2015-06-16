@@ -10,10 +10,10 @@
 }(this, function (esprima) {
  'use strict';
 
-  var hasOwn = Object.prototype.hasOwnProperty;
-  function hasProp(obj, prop) {
-    return hasOwn.call(obj, prop);
-  }
+  // var hasOwn = Object.prototype.hasOwnProperty;
+  // function hasProp(obj, prop) {
+  //   return hasOwn.call(obj, prop);
+  // }
 
   //From an esprima example for traversing its ast.
   function traverse(object, visitor) {
@@ -38,7 +38,7 @@
     }
   }
 
-  function translateImport(node, simulateCycle) {
+  function translateImport(node, depIds, simulateCycle) {
     var translation = {
       range: node.range,
       ids: {},
@@ -52,6 +52,9 @@
     var result = '';
 
     var depId = translation.depId = node.source.value;
+    if (depIds.indexOf(depId) === -1) {
+      depIds.push(depId);
+    }
 
     node.specifiers.forEach(function(specifier) {
       var imported,
@@ -138,6 +141,7 @@
     var simulateCycle = !!options.simulateCycle;
 
     var translations = [];
+    var depIds = [];
 
     var ast = esprima.parse(source, {
       range: true,
@@ -153,7 +157,7 @@
       var translation;
 
       if (node.type === 'ImportDeclaration') {
-        translation = translateImport(node, simulateCycle);
+        translation = translateImport(node, depIds, simulateCycle);
 
         if (simulateCycle) {
           Object.keys(translation.ids).forEach(function(key) {
@@ -194,6 +198,7 @@
 
     return {
       translated: true,
+      depIds: depIds,
       //source: 'define(function(require, exports, module) { ' + source + ' });'
       source: source
     };
