@@ -1,6 +1,6 @@
 {
   "name": "esm-es5",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "esm-es5.js",
   "scripts": {
@@ -16,8 +16,10 @@
     "url": "https://github.com/jrburke/esm-es5/issues"
   },
   "homepage": "https://github.com/jrburke/esm-es5",
+  "dependencies": {
+    "esprima": "^2.2.0"
+  },
   "devDependencies": {
-    "esprima": "^2.2.0",
     "mocha": "^2.2.5"
   }
 }
