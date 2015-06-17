@@ -4,7 +4,7 @@ Converts ES2015 module syntax to ES5 code that can be used in an AMD or CommonJS
 
 Does not support all of ES2015 syntax, like classes or fat arrows, just does some light translation work related to `import` and `export`.
 
-Used in some [amodro-lifecycle]() projects to prove out the lifecycle and module system interoperability.
+Used in some [amodro-lifecycle](https://github.com/amodrojs/amodro-lifecycle) projects to validate lifecycle and module system interoperability.
 
 ## Usage
 
@@ -23,13 +23,13 @@ esmResult.translated = Boolean;
 esmResult.source = String;
 
 // If tranlated, an array of import dependency IDs.
-esmResult.ids = Array.
+esmResult.ids = Array;
 ```
 
 ### Options
 
-Right now there are not options, but a `simulateCycle` option is planned. It will
-replace the identifier for an import with a module meta get call inline, to simulate the kind of cycle support possible in a true ES2015 module system. It will not be an exact dulpication (for example, it cannot handle export var assignments outside the initial export statement), but will help the most common type of cycle resolution with declarative exports that only assign in the export statement.
+Right now there are no options, but a `simulateCycle` option is planned. It will
+replace the identifier for an import with a module meta get call, to simulate the kind of cycle support possible in a true ES2015 module system. It will not be an exact simulation (for example, it cannot handle export var assignments outside the initial export statement), but will help the most common type of cycle resolution with declarative exports that only assign in the export statement.
 
 ## Transforms not supported
 
@@ -44,6 +44,4 @@ See the test/source directory for source forms supported, and test/expected for 
 ## todo
 
 * replace identifiers for simulateCycle option. Won't support var a; export a; a = 5;, but still useful.
-* option around define() wrapping?
 * hack in support for a module meta? `import { require, normalize } from module`?
-
