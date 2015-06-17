@@ -39,6 +39,8 @@ No `export *` support. May be added later. Instead, use named exports for cleare
 
 There could be some other cases not handled yet, but likely just mistakenly overlooked, feel free to file issues with examples.
 
+See the test/source directory for source forms supported, and test/expected for the translated ES5 result.
+
 ## todo
 
 * replace identifiers for simulateCycle option. Won't support var a; export a; a = 5;, but still useful.
