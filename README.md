@@ -8,8 +8,6 @@ Used in some [amodro-lifecycle](https://github.com/amodrojs/amodro-lifecycle) pr
 
 ## Usage
 
-It is a UMD module, available in npm and bower. Basic usage:
-
 ```javascript
 // source is the String contents of a module, options is an object.
 var esmResult = esmEs5(source, options);
