@@ -38,7 +38,7 @@
     }
   }
 
-  function translateImport(node, depIds, simulateCycle) {
+  function translateImport(node, depIds, source, simulateCycle) {
     var translation = {
       range: node.range,
       ids: {},
@@ -91,7 +91,7 @@
     return translation;
   }
 
-  function translateDefaultExport(node) {
+  function translateDefaultExport(node, source) {
     var translation = {
       range: [node.range[0], node.declaration.range[0]],
       result: 'exports.default = '
@@ -100,30 +100,55 @@
     return translation;
   }
 
-  function translateNamedExport(node) {
+  function translateNamedExport(node, source) {
     var translation = {
       range: [node.range[0], 0],
       result: ''
     };
 
+    var result = '';
+
     if (node.declaration) {
-      // export function name() {}
-      translation.range[1] = node.declaration.range[0];
+      if (node.declaration.type === 'FunctionDeclaration') {
+        // export function name() {}
+        translation.range[1] = node.declaration.range[0];
 
-      // Find the identifier name to use for the export
-      var id;
-      traverse(node, function(node) {
-        if (!id && node.type === 'Identifier') {
-          id = node.name;
-          return false;
-        }
-      });
+        // Find the identifier name to use for the export
+        var id;
+        traverse(node, function(node) {
+          if (!id && node.type === 'Identifier') {
+            id = node.name;
+            return false;
+          }
+        });
 
-      translation.result = 'exports.' + id + ' = ';
+        translation.result = 'exports.' + id + ' = ';
+      } else if (node.declaration.type === 'VariableDeclaration') {
+
+        var endIndex = node.declaration.declarations.length - 1;
+        translation.range[1] = node.declaration.declarations[endIndex]
+                               .range[1];
+
+        var ids = [];
+        node.declaration.declarations.forEach(function(declaration) {
+          if (declaration.id.type === 'Identifier') {
+            ids.push(declaration.id.name);
+          }
+        });
+
+        result = source.substring(translation.range[0],
+                                  translation.range[1])
+                                  .replace(/export\s+/, '');
+
+        ids.forEach(function(id) {
+          result += '; exports.' + id + ' = ' + id;
+        });
+
+        translation.result = result;
+      }
     } else {
       // export { name as other }
       translation.range[1] = node.range[1];
-      var result = '';
       node.specifiers.forEach(function(specifier) {
         var local = specifier.local.name,
             exported = specifier.exported.name;
@@ -157,7 +182,7 @@
       var translation;
 
       if (node.type === 'ImportDeclaration') {
-        translation = translateImport(node, depIds, simulateCycle);
+        translation = translateImport(node, depIds, source, simulateCycle);
 
         if (simulateCycle) {
           Object.keys(translation.ids).forEach(function(key) {
@@ -167,9 +192,9 @@
 
         translations.push(translation);
       } else if (node.type === 'ExportDefaultDeclaration') {
-        translations.push(translateDefaultExport(node));
+        translations.push(translateDefaultExport(node, source));
       } else if (node.type === 'ExportNamedDeclaration') {
-        translations.push(translateNamedExport(node));
+        translations.push(translateNamedExport(node, source));
       } else if (simulateCycle && options.node.type === 'Identifier') {
         // Translate the identifiers to getters for imports.
   //todo
