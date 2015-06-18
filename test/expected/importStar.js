@@ -1,1 +1,1 @@
-var foo = require('bar');
+'use strict'; var foo = require('bar');

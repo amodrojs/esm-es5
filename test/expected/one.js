@@ -1,1 +1,1 @@
-var name = require('module-name').default;
+'use strict'; var name = require('module-name').default;
